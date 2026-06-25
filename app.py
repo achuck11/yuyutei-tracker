@@ -35,13 +35,14 @@ def process_trend_data(sub_df, latest):
         history = sub_df[(sub_df["CardID"] == row["CardID"]) & 
                          (sub_df["Rarity"] == row["Rarity"])].sort_values("Timestamp")
         
-        # 轉換為字典以確保保留所有原始欄位 (包含 SortIndex)
+        # 轉換為字典並保留所有原始欄位 (包含 SortIndex)
         new_row = row.to_dict()
         
         start_date = history.iloc[0]["Timestamp"][:10]
         initial_price = history.iloc[0]["Price"]
         current_price = row["Price"]
         
+        # 計算總漲幅
         total_change = ((current_price - initial_price) / initial_price) * 100 if initial_price > 0 else 0
         
         new_row["監控起始"] = start_date
@@ -61,23 +62,23 @@ if not df.empty and not config_df.empty:
             st.caption(f"🔗 來源網址: {row['URL']}")
             sub_df = df[df["URL"] == row["URL"]].copy()
             
-            # 強制轉型，確保排序依據是數字
+            # 強制數值化，避免排序錯誤
             sub_df["SortIndex"] = pd.to_numeric(sub_df["SortIndex"], errors='coerce')
             sub_df["Price"] = pd.to_numeric(sub_df["Price"], errors='coerce')
             
-            # 分組取最新值 (as_index=False 確保 SortIndex 保留在 DataFrame 中)
+            # 分組取最新值 (as_index=False 確保分組後的列依然包含所有欄位)
             latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity", "SortIndex"], as_index=False).last()
             
-            # 計算趨勢
+            # 計算趨勢 (函數內會透過 to_dict 確保 SortIndex 被帶入新表格)
             latest = process_trend_data(sub_df, latest)
             
-            # 排序
+            # 排序：依據遊々亭網頁原本的原始排序
             latest = latest.sort_values("SortIndex")
             
-            # 顯示表格 (使用新版 width='stretch' 參數)
+            # 顯示表格 (此處選取的欄位不包含 SortIndex，保持版面乾淨)
             st.dataframe(
                 latest[["CardID", "Name", "Rarity", "Price", "監控起始", "總漲幅", "Stock"]], 
-                width='stretch', # 設定為 None 會自動隨容器寬度伸展
+                width='stretch', 
                 hide_index=True
             )
 else:
