@@ -67,14 +67,16 @@ if not df.empty and not config_df.empty:
             sub_df["Price"] = pd.to_numeric(sub_df["Price"], errors='coerce')
             
             # 分組取最新值 (as_index=False 確保分組後的列依然包含所有欄位)
-            latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity", "SortIndex"], as_index=False).last()
-            
+            latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity"], as_index=False).last()
+            latest = latest.merge(sub_df[["CardID", "Rarity", "SortIndex"]].drop_duplicates(), 
+                      on=["CardID", "Rarity"], how="left")
             # 計算趨勢 (函數內會透過 to_dict 確保 SortIndex 被帶入新表格)
             latest = process_trend_data(sub_df, latest)
             
             # 排序：依據遊々亭網頁原本的原始排序
+            latest["SortIndex"] = pd.to_numeric(latest["SortIndex"], errors='coerce')
             latest = latest.sort_values("SortIndex")
-            
+
             # 顯示表格 (此處選取的欄位不包含 SortIndex，保持版面乾淨)
             st.dataframe(
                 latest[["CardID", "Name", "Rarity", "Price", "監控起始", "總漲幅", "Stock"]], 
