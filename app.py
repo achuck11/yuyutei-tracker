@@ -77,7 +77,7 @@ if not df.empty and not config_df.empty:
             # 顯示表格 (使用新版 width='stretch' 參數)
             st.dataframe(
                 latest[["CardID", "Name", "Rarity", "Price", "監控起始", "總漲幅", "Stock"]], 
-                width=stretch, # 設定為 None 會自動隨容器寬度伸展
+                width='stretch', # 設定為 None 會自動隨容器寬度伸展
                 hide_index=True
             )
 else:
