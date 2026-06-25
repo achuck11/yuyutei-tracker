@@ -1,0 +1,37 @@
+name: Yuyutei Price Tracker
+
+on:
+  # 設定自動執行時間 (使用 UTC 時間，比台灣慢 8 小時)
+  # 目前設定為每天 UTC 0:00, 6:00, 12:00, 18:00 (台灣時間 8:00, 14:00, 20:00, 2:00)
+  schedule:
+    - cron: '0 0,6,12,18 * * *'
+  # 允許我們在 GitHub 網頁上手動點擊「執行」按鈕來測試
+  workflow_dispatch: 
+
+jobs:
+  scrape-and-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 取得程式碼
+        uses: actions/checkout@v3
+
+      - name: 🐍 設定 Python 環境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📦 安裝 Python 套件
+        run: |
+          pip install -r requirements.txt
+
+      - name: 🌐 安裝 Playwright 瀏覽器
+        run: |
+          playwright install chromium
+
+      - name: 🚀 執行爬蟲腳本
+        env:
+          # 將 GitHub Secrets 中的憑證注入為環境變數
+          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        run: |
+          python crawler.py
