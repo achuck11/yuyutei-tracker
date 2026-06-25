@@ -59,17 +59,17 @@ if not df.empty and not config_df.empty:
             st.caption(f"🔗 來源網址: {row['URL']}")
             sub_df = df[df["URL"] == row["URL"]].copy()
             
-            # 確保欄位數值化
+            # 確保欄位數值化 (放在最前面以免出錯)
             sub_df["SortIndex"] = pd.to_numeric(sub_df["SortIndex"], errors='coerce')
             sub_df["Price"] = pd.to_numeric(sub_df["Price"], errors='coerce')
+
+            # 【修正關鍵】：將 SortIndex 加入 groupby 清單，並確保它不被丟棄
+            latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity", "SortIndex"], as_index=False).last()
             
-            # 取得該網址下每張卡片的最新數據
-            latest = latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity", "SortIndex"]).last().reset_index()
-            
-            # 處理趨勢與日期顯示
+            # 處理趨勢與日期顯示 (這函數會回傳包含所有欄位的 DataFrame)
             latest = process_trend_data(sub_df, latest)
             
-            # 排序：依據遊々亭網頁原本的原始排序
+            # 【修正關鍵】：現在 DataFrame 一定會有 SortIndex，排序就不會報錯了
             latest = latest.sort_values("SortIndex")
             
             # 顯示表格
