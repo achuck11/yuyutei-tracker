@@ -64,7 +64,7 @@ if not df.empty and not config_df.empty:
             sub_df["Price"] = pd.to_numeric(sub_df["Price"], errors='coerce')
             
             # 取得該網址下每張卡片的最新數據
-            latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity"]).last().reset_index()
+            latest = latest = sub_df.sort_values("Timestamp").groupby(["CardID", "Rarity", "SortIndex"]).last().reset_index()
             
             # 處理趨勢與日期顯示
             latest = process_trend_data(sub_df, latest)
