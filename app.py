@@ -17,7 +17,7 @@ def load_data():
         client = gspread.authorize(creds)
         
         # 請填入你真實的試算表 KEY
-        spreadsheet_key = "請填入你試算表網址中的那一長串KEY"
+        spreadsheet_key = "1KeCPC0fEYiZB4_bWvFcroePVrt8XS1Uu3HrKMaRfW_Y"
         spreadsheet = client.open_by_key(spreadsheet_key)
         
         config_data = spreadsheet.worksheet("ListConfig").get_all_records()
