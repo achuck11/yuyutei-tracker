@@ -1,4 +1,10 @@
+# 這是網頁 (app.py) 需要的
 streamlit
 pandas
 gspread
-oauth2client
+google-auth
+
+# 這是爬蟲 (crawler.py) 額外需要的
+requests
+beautifulsoup4
+playwright
