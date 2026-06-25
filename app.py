@@ -19,7 +19,7 @@ def load_data():
         
         # 使用精準的 Key 存取試算表
         # 請將下面這串字換成你網址中的 Key (例如: 1AbCdEfGhIjKlMnOpQrStUvWxYz)
-        spreadsheet_key = "請填入你試算表網址中的那一長串KEY"
+        spreadsheet_key = "1KeCPC0fEYiZB4_bWvFcroePVrt8XS1Uu3HrKMaRfW_Y"
         spreadsheet = client.open_by_key(spreadsheet_key)
         
         # 讀取資料
