@@ -24,7 +24,24 @@ def load_data():
         st.error(f"資料庫讀取失敗: {e}")
         return pd.DataFrame()
 
-df = load_data()
+@st.cache_data(ttl=300)
+def load_data():
+    try:
+        # 強制指定憑證環境
+        creds_dict = st.secrets["gcp_service_account"]
+        creds = Credentials.from_service_account_info(creds_dict, scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"])
+        client = gspread.authorize(creds)
+        
+        # 這裡請務必確認名稱要跟雲端檔案名稱一模一樣
+        spreadsheet = client.open("遊々亭雲端監控資料庫") 
+        history_sheet = spreadsheet.worksheet("PriceHistory")
+        
+        data = history_sheet.get_all_records()
+        return pd.DataFrame(data)
+    except Exception as e:
+        # 關鍵：這會強制讓網頁不要卡死，而是顯示出紅色的錯誤原因
+        st.error(f"連線錯誤: {e}")
+        return pd.DataFrame()
 
 if not df.empty:
     # 按照網址分類成多個分頁顯示
